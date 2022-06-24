@@ -24,15 +24,18 @@ def get_avg_gray_value(img):
 
 
 def save2local(x_pts, y_pts, cfg: Config):
+    print("\n===========SAVING TO LOCAL===========")
     # 生成保存路径
     file_name = os.path.splitext(os.path.split(cfg.FILE_PATH)[-1])[0]
     save_path = os.path.join('./', file_name+'_result.txt')
+
     # 判断结果文件是否存在
     # 若文件存在提示是否进行覆写操作
     try:
         if os.path.isfile(save_path):
-            if not input("The result file already exists, do you want to overwrite it?(press y to confirm) ") is 'y':
-                print('Results not saved!')
+            print_info("The result file already exists, do you want to overwrite it?", 1)
+            if not input("enter 'y' to confirm: ") is 'y':
+                print_info("Results not saved!", 0)
                 return
     except FileNotFoundError:
         pass
@@ -41,7 +44,22 @@ def save2local(x_pts, y_pts, cfg: Config):
     with open(save_path, 'w') as f:
         for i in range(len(x_pts)):
             f.write(str(y_pts[i])+'\n')
-        print("Result saved!")
+        print_info("Result saved!", 0)
+
+
+def print_info(info, info_type):
+    """
+    以彩色形式显示提示信息
+    :param info: 信息内容
+    :param info_type: 0代表INFO类型
+                      1代表WARNING类型
+    """
+    assert info_type in [0, 1]
+    if info_type == 0:
+        info = f"\033[0;32m[INFO] {info}\033[0m"
+    elif info_type == 1:
+        info = f"\033[0;33m[WARNING] {info}\033[0m"
+    print(info)
 
 
 def main():
@@ -51,6 +69,7 @@ def main():
     x_points = []
     y_points = []
 
+    # 读取视频文件并进行处理
     capture = cv.VideoCapture(myconfig.FILE_PATH)
     frame_count = 0
     while capture.isOpened():
@@ -85,14 +104,16 @@ def main():
             break
         frame_count += 1
 
+    # 回收视频资源
+    capture.release()
+    cv.destroyAllWindows()
     # 将结果保存至本地
     save2local(x_points, y_points, myconfig)
     # 折线图绘制
+    print("\n===========SHOW THE GRAPH============")
+    print_info("Chart displayed", 0)
     plt.plot(x_points, y_points)
     plt.show()
-    # 回收资源
-    capture.release()
-    cv.destroyAllWindows()
 
 
 if __name__ == '__main__':
