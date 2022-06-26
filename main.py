@@ -7,12 +7,15 @@ import numpy as np
 
 def parse_opt():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--path', default='./simples/20Hz.mp4', help='视频文件路径')
-    parser.add_argument('--save', type=bool, default=True, help='是否将检测结果保存至本地txt文件')
-    parser.add_argument('--left_top', type=list, default=[500, 600], help='左上角顶点坐标')
-    parser.add_argument('--right-bottom', type=list, default=[800, 900], help='右下角顶点坐标')
-    parser.add_argument('--color', type=list, default=[0, 0, 255], help='边框颜色(BGR)')
+    parser.add_argument('--path', default='./simples/10Hz.mp4', help='视频文件路径')
+    parser.add_argument('--save', default='True', choices=['True', 'False'], help='是否将检测结果保存至本地txt文件')
+    parser.add_argument('--left_top', nargs='+', type=int, default=[500, 600], help='左上角顶点坐标')
+    parser.add_argument('--right-bottom', nargs='+', type=int, default=[800, 900], help='右下角顶点坐标')
+    parser.add_argument('--color', nargs='+', type=int, default=[0, 0, 255], help='边框颜色(BGR)')
     opt = parser.parse_args()
+
+    # 校验输入内容是否合法
+
     return opt
 
 
@@ -23,27 +26,28 @@ def get_avg_gray_value(img):
 
 
 def save2local(x_pts, y_pts, opt):
-    print("\n===========SAVING TO LOCAL===========")
-    # 生成保存路径
-    file_name = os.path.splitext(os.path.split(opt.path)[-1])[0]
-    save_path = os.path.join('./', file_name+'_result.txt')
+    if opt.save == 'True':
+        print("\n===========SAVING TO LOCAL===========")
+        # 生成保存路径
+        file_name = os.path.splitext(os.path.split(opt.path)[-1])[0]
+        save_path = os.path.join('./', file_name + '_result.txt')
 
-    # 判断结果文件是否存在
-    # 若文件存在提示是否进行覆写操作
-    try:
-        if os.path.isfile(save_path):
-            print_info("The result file already exists, do you want to overwrite it?", 1)
-            if not input("enter 'y' to confirm: ") is 'y':
-                print_info("Results not saved!", 1)
-                return
-    except FileNotFoundError:
-        pass
+        # 判断结果文件是否存在
+        # 若文件存在提示是否进行覆写操作
+        try:
+            if os.path.isfile(save_path):
+                print_info("The result file already exists, do you want to overwrite it?", 1)
+                if not input("enter 'y' to confirm: ") is 'y':
+                    print_info("Results not saved!", 1)
+                    return
+        except FileNotFoundError:
+            pass
 
-    # 将灰度值结果保存至本地
-    with open(save_path, 'w') as f:
-        for i in range(len(x_pts)):
-            f.write(str(y_pts[i])+'\n')
-        print_info("Result saved!", 0)
+        # 将灰度值结果保存至本地
+        with open(save_path, 'w') as f:
+            for i in range(len(x_pts)):
+                f.write(str(y_pts[i]) + '\n')
+            print_info("Result saved!", 0)
 
 
 def print_info(info, info_type):
@@ -52,8 +56,9 @@ def print_info(info, info_type):
     :param info: 信息内容
     :param info_type: 0代表INFO类型
                       1代表WARNING类型
+                      2代表ERROR类型
     """
-    assert info_type in [0, 1]
+    assert info_type in [0, 1, 2]
     if info_type == 0:
         info = f"\033[0;32m[INFO] {info}\033[0m"
     elif info_type == 1:
@@ -62,6 +67,7 @@ def print_info(info, info_type):
 
 
 def main(opt):
+    print(opt.color)
     # 待绘制点集
     x_points = []
     y_points = []
