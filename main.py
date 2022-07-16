@@ -3,6 +3,9 @@ import argparse
 import cv2 as cv
 import matplotlib.pyplot as plt
 import numpy as np
+import datetime
+from colorama import Fore
+from colorama import Style
 
 
 def parse_opt():
@@ -15,6 +18,25 @@ def parse_opt():
     opt = parser.parse_args()
 
     # 校验输入内容是否合法
+    try:
+        assert len(opt.left_top) == 2
+    except AssertionError:
+        print_info(f'左上角顶点坐标需要x,y两个值,而不是{len(opt.left_top)}个', 2)
+        return
+
+    try:
+        assert len(opt.right_bottom) == 2
+    except AssertionError:
+        print_info(f'左上角顶点坐标需要x,y两个值,而不是{len(opt.right_bottom)}个', 2)
+        return
+
+    try:
+        height = opt.right_bottom[1] - opt.left_top[1]
+        width = opt.right_bottom[0] - opt.left_top[0]
+        assert height > 0 and width > 0
+    except AssertionError:
+        print_info('请重新确认两点坐标相对位置（左上角顶点为[0,0]）', 2)
+        return
 
     return opt
 
@@ -26,23 +48,25 @@ def get_avg_gray_value(img):
 
 
 def save2local(x_pts, y_pts, opt):
-    if opt.save == 'True':
-        print("\n===========SAVING TO LOCAL===========")
+    if opt.save == "True":
+        print(Style.BRIGHT + "\n===========SAVING TO LOCAL===========" + Style.RESET_ALL)
         # 生成保存路径
         file_name = os.path.splitext(os.path.split(opt.path)[-1])[0]
-        save_path = os.path.join('./', file_name + '_result.txt')
-
+        save_dir = "./result"
+        save_path = os.path.join(save_dir, file_name + '_result.txt')
+        # 判断保存路径是否已经存在
+        if not os.path.isdir(save_dir):
+            os.makedirs(save_dir)
         # 判断结果文件是否存在
         # 若文件存在提示是否进行覆写操作
         try:
             if os.path.isfile(save_path):
                 print_info("The result file already exists, do you want to overwrite it?", 1)
-                if not input("enter 'y' to confirm: ") is 'y':
+                if input("enter 'y' to confirm: ") != 'y':
                     print_info("Results not saved!", 1)
                     return
         except FileNotFoundError:
             pass
-
         # 将灰度值结果保存至本地
         with open(save_path, 'w') as f:
             for i in range(len(x_pts)):
@@ -59,15 +83,17 @@ def print_info(info, info_type):
                       2代表ERROR类型
     """
     assert info_type in [0, 1, 2]
+    d = str(datetime.datetime.now().strftime('%H:%M:%S'))
     if info_type == 0:
-        info = f"\033[0;32m[INFO] {info}\033[0m"
+        info = d + Fore.GREEN + f" [INFO] {info}" + Fore.RESET
     elif info_type == 1:
-        info = f"\033[0;33m[WARNING] {info}\033[0m"
+        info = d + Fore.YELLOW + f" [WARNING] {info}" + Fore.RESET
+    elif info_type == 2:
+        info = d + Fore.RED + f" [ERROR] {info}" + Fore.RESET
     print(info)
 
 
 def main(opt):
-    print(opt.color)
     # 待绘制点集
     x_points = []
     y_points = []
@@ -113,7 +139,7 @@ def main(opt):
     # 将结果保存至本地
     save2local(x_points, y_points, opt)
     # 折线图绘制
-    print("\n===========SHOW THE GRAPH============")
+    print(Style.BRIGHT + "\n===========SHOW THE GRAPH============" + Style.RESET_ALL)
     print_info("Chart displayed", 0)
     plt.plot(x_points, y_points)
     plt.show()
