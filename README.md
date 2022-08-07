@@ -36,4 +36,10 @@ pip install -r C:\...\requirements.txt
 ```
 ### 在Pycharm中运行程序
 使用pycharm打开本项目，在菜单中依次选择:<br />
-File-->Settings-->Project-->Python Interpreter
+***File-->Settings-->Project-->Python Interpreter***
+![image](guide/guide1.png)
+为项目添加解释器后，在右上角选择Add Configuration添加运行脚本，如下图所示，正确的选择解释器与脚本路径：
+![image](guide/guide2.png)
+
+### 从编译器运行
+### 从终端运行
