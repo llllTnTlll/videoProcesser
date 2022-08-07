@@ -34,12 +34,12 @@ activate env
 ```commandline
 pip install -r C:\...\requirements.txt
 ```
-### 在Pycharm中运行程序
+### 对Pycharm进行配置
 使用pycharm打开本项目，在菜单中依次选择:<br />
 ***File-->Settings-->Project-->Python Interpreter***
 ![image](guide/guide1.png)
 为项目添加解释器后，在右上角选择Add Configuration添加运行脚本，如下图所示，正确的选择解释器与脚本路径：
 ![image](guide/guide2.png)
-
-### 从编译器运行
-### 从终端运行
+### 从Pycharm运行
+在配置完成后，程序可以从Pycharm直接启动，单击工具栏运行按钮即可以默认配置运行程序。<br />
+当需要对配置进行修改时，请参照“关键参数配置”章节中的说明直接在程序做出修改。
