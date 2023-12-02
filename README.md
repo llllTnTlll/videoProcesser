@@ -1,4 +1,4 @@
-# videoProcessing
+# videoProcesser
 本项目是为四氧化三铁水合物磁场扰动编写的灰度值分析程序（简介项目）
 ## 主要功能
 - 借助OpenCV实现对视频特定区域的灰度值追踪
